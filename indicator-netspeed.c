@@ -15,6 +15,8 @@ License: this software is in the public domain.
 #include <glibtop/netlist.h>
 #include <pango/pango.h>
 #include <gio/gio.h>
+#include <libnotify/notify.h>
+#include <stdio.h>
 #include <stdbool.h>
 
 #define TRACE(...) if (trace) { printf( __VA_ARGS__); fflush(stdout); } else {}
@@ -192,6 +194,21 @@ gboolean update() {
     int net_down = net_traffic[0];
     int net_up = net_traffic[1];
     int net_total = net_down + net_up;
+
+    if(net_total > 200000){
+        notify_init("indicator-netspeed");
+        char str[15];
+        sprintf(str, "%d", net_total);
+        NotifyNotification* n = notify_notification_new ("NET USAGE HIGH", str,0);
+        notify_notification_set_timeout(n, 10000); // 10 seconds
+
+        if (!notify_notification_show(n, 0)) 
+        {
+            printf( "show has failed");
+            return -1;
+        }
+    }
+
 
     gchar *indicator_label = format_net_label(net_total, true);
     gchar *label_guide = "10000.00 MiB/s";   //maximum length label text, doesn't really work atm
