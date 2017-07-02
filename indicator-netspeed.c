@@ -141,15 +141,15 @@ void get_net(int traffic[2])
 void if_signal_select(GtkMenuItem *menu_item, gpointer user_data) {
     //set currently selected interface from user selection
     gchar *old_if_name = selected_if_name;
-    
+
     // We're allocating a new string here, but we don't need to free the previous
-    // one because the call to gtk_menu_item_set_label below does that already. 
+    // one because the call to gtk_menu_item_set_label below does that already.
     selected_if_name = g_strdup(gtk_menu_item_get_label(menu_item));
     TRACE("Selected interface %s\n", selected_if_name);
     // frees the previous selected_if_name
     gtk_menu_item_set_label(if_chosen, selected_if_name);
     g_settings_set_value (settings, "if-name", g_variant_new_string(selected_if_name));
-    
+
 
     first_run = TRUE;
     update();
@@ -198,11 +198,11 @@ gboolean update() {
     if(net_total > 200000){
         notify_init("indicator-netspeed");
         char str[15];
-        sprintf(str, "%d", net_total);
-        NotifyNotification* n = notify_notification_new ("NET USAGE HIGH", str,0);
-        notify_notification_set_timeout(n, 10000); // 10 seconds
+        //sprintf(str, "%d", net_total);
+        NotifyNotification* n = notify_notification_new ("NET USAGE HIGH", format_net_label(net_total, false),0);
+        notify_notification_set_timeout(n, 500); // 10 seconds
 
-        if (!notify_notification_show(n, 0)) 
+        if (!notify_notification_show(n, 0))
         {
             printf( "show has failed");
             return -1;
